@@ -1,3 +1,8 @@
+# :warning: DISCONTINUED :warning:
+## This project has been discontinued due to the group not being as active anymore, however development will resume at some point in future on a fork.
+
+---
+
 # SpawnCult Bot
 #### A bot for the SpawnCult Discord server
 
@@ -46,7 +51,7 @@ If you get any errors dont you dare complain to me.
 ## Development
 You'll need a text editor (an IDE is not required, but recommended, I personally recommend VScode).
 
-Install all NPM packages and run `npm run build-watch` (or `yarn build-watch`), keep in mind you need to install tsc beforehand.
+Install all NPM packages and run `npm run build-watch` (or `yarn build-watch`), ~~keep in mind you need to install tsc beforehand~~ (tsc should be installed in devDependencies).
 
 The bot will be recompiled everytime you save a file now.
 
