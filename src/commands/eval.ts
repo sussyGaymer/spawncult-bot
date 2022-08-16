@@ -9,7 +9,8 @@ const EvalCommand: Command = {
         optional: false,
         end: true,
     },
-    listener: (client, message, args) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    listener: (client, message, args, commandsManager, musicManager) => {
         if (!args || !args[0])
             return message.reply("Please provide some code to evaluate.");
 

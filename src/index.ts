@@ -1,5 +1,6 @@
 import { Client, Intents } from "discord.js";
 import CommandsManager from "./managers/Commands";
+import MusicManager from "./managers/Music";
 import { connectToDatabase } from "./services/database.service";
 import Logger from "./util/Logger";
 
@@ -32,7 +33,9 @@ client.on("ready", (payload) => {
 
     connectToDatabase()
         .then(() => {
-            new CommandsManager().init(client);
+            const musicManager = new MusicManager(client);
+            const commandsManager = new CommandsManager();
+            commandsManager.init(client, musicManager);
         })
         .catch((err: Error) => {
             Logger.error("Error connecting to the database: " + err.message);

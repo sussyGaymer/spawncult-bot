@@ -4,9 +4,11 @@ import { Client, Message } from "discord.js";
 import Config from "../models/config";
 import { collections } from "../services/database.service";
 import Logger from "../util/Logger";
+import MusicManager from "./Music";
 
 export default class CommandsManager {
     client!: Client;
+    music!: MusicManager;
 
     commands: Command[] = [];
     prefix = "_";
@@ -33,17 +35,18 @@ export default class CommandsManager {
         )
             return;
 
-        command.listener(this.client, message, args, this);
+        //TODO: parse args and validate beforehand
+        command.listener.call(
+            command,
+            this.client,
+            message,
+            args,
+            this,
+            this.music,
+        );
     }
 
-    async init(client: Client) {
-        if (this.hasInit) throw new Error("CommandsManager has already init!");
-
-        Logger.info("Initializing the commands manager.");
-
-        this.hasInit = true;
-        this.client = client;
-
+    loadCommands() {
         const isEnvDevelopment = process.env.NODE_ENV === "development";
         const commandFiles = fs
             //please somene get rid of the ugly ternary expression
@@ -61,9 +64,25 @@ export default class CommandsManager {
 
         const requiredFields = ["name", "listener"];
 
-        this.commands = commands.filter((cmd) =>
-            Object.keys(cmd).some((key) => !requiredFields.includes(key)),
+        this.commands = commands.filter(
+            (cmd) =>
+                cmd &&
+                requiredFields.every((f) =>
+                    Object.keys(cmd).some((x) => x.includes(f)),
+                ),
         );
+    }
+
+    async init(client: Client, music: MusicManager) {
+        if (this.hasInit) throw new Error("CommandsManager has already init!");
+
+        Logger.info("Initializing the commands manager.");
+
+        this.hasInit = true;
+        this.client = client;
+        this.music = music;
+
+        this.loadCommands();
 
         const prefix = (await collections.configs?.findOne({
             name: "prefix",
@@ -74,7 +93,7 @@ export default class CommandsManager {
         client.on("messageCreate", this.listener.bind(this));
 
         Logger.info(
-            "Successfully initialized the commands manager with prefix '" +
+            "Initialized the commands manager with prefix '" +
                 this.prefix +
                 "'. Loaded commands: " +
                 this.commands.map((x) => x.name).join(", "),
